@@ -1,39 +1,52 @@
 {
+  description = "GIF picker and viewer for Hyprland";
+
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-    quickshell.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
       self,
       nixpkgs,
-      quickshell,
-    }:
+      ...
+    }@inputs:
     let
-      system = "x86_64-linux"; # or "aarch64-darwin", etc.
-      pkgs = nixpkgs.legacyPackages.${system};
+      forAllSystems =
+        fn: nixpkgs.lib.genAttrs nixpkgs.lib.platforms.linux (system: fn nixpkgs.legacyPackages.${system});
     in
     {
-      devShells.${system}.default = pkgs.mkShellNoCC {
-        packages = [
-          quickshell.packages.${system}.default
-        ];
-        shellHook = ''
-          echo "------------------------------------------------"
-          echo "🚀 Quickshell Development Environment Active"
-          echo "Source: ${quickshell}"
-          echo "        To exit run \"exit\" or Ctrl-D"
-          echo "------------------------------------------------"
+      packages = forAllSystems (pkgs: rec {
+        myna = pkgs.callPackage ./nix {
+          quickshell = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+        default = myna;
+      });
 
-          # Example: Exporting an environment variable
-          export QS_DEBUG=1
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShellNoCC {
+          packages = [
+            inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default
+          ];
 
-          # Example: Setting a custom alias for this project
-          alias qsr="quickshell -p ."
-        '';
+          shellHook = ''
+            echo "------------------------------------------------"
+            echo ":rocket: Quickshell Development Environment Active"
+            echo "Source: ${inputs.quickshell.outPath}"
+            echo "        To exit run \"exit\" or Ctrl-D"
+            echo "------------------------------------------------"
 
-      };
+            export QS_DEBUG=1
+            alias qsr="quickshell -p ."
+          '';
+        };
+      });
+
+      homeManagerModules.default = import ./nix/home-manager.nix self;
     };
 }

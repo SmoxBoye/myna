@@ -15,6 +15,8 @@ ShellRoot {
     
     readonly property string apiKey: JSON.parse(apiFile.text())["key"]
     property string customerId: "jiffy-user"
+
+    readonly property string homeDir: Quickshell.env("HOME")
     
     // --- Data Models ---
     property var searchResults: []
@@ -23,17 +25,33 @@ ShellRoot {
     
     property string currentPanel: "search"
 
-    Component.onCompleted: loadFavorites()
+    Component.onCompleted: {
+    // Ensure directories exist so FileView doesn't explode
+    dirMaker.command = ["mkdir", "-p", 
+        root.homeDir + "/.config/myna", 
+        root.homeDir + "/.local/share/myna"
+    ];
+    dirMaker.running = true;
+    }
+
+    Process {
+        id: dirMaker
+        running: false
+        onExited: {
+            // Only load favorites AFTER we know the folders are ready
+            root.loadFavorites();
+        }
+    }
 
     FileView {
         id: apiFile
-        path: Qt.resolvedUrl("$HOME/.config/jiffy/config.json") // TODO: Maybe actually make XDG work
+        path: "file://" + root.homeDir + "/.config/myna/config.json"
         blockLoading: true
     }
 
     FileView {
         id: favoritesFile
-        path: Qt.resolvedUrl("$HOME/.local/share/jiffy/favorites.json") // TODO: Same as above
+        path: "file://" + root.homeDir + "/.local/share/myna/favorites.json"
         blockLoading: true
     }
 
