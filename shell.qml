@@ -14,7 +14,7 @@ ShellRoot {
     readonly property int maxFavoritesTotal: 100
     
     readonly property string apiKey: JSON.parse(apiFile.text())["key"]
-    property string customerId: "jiffy-user"
+    property string customerId: "myna-user"
 
     readonly property string homeDir: Quickshell.env("HOME")
     
