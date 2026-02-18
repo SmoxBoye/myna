@@ -13,7 +13,15 @@ ShellRoot {
     readonly property int maxHistoryPerGif: 50
     readonly property int maxFavoritesTotal: 100
     
-    readonly property string apiKey: JSON.parse(apiFile.text())["key"]
+    readonly property string apiKey: {
+        try {
+            var txt = apiFile.text();
+            if (!txt || txt.trim() === "") return "";
+            return JSON.parse(txt)["key"] || "";
+        } catch (e) {
+            return "";
+        }
+    }
     property string customerId: "myna-user"
 
     readonly property string homeDir: Quickshell.env("HOME")
@@ -53,6 +61,7 @@ ShellRoot {
         id: favoritesFile
         path: "file://" + root.homeDir + "/.local/share/myna/favorites.json"
         blockLoading: true
+        // blockWrites: true
     }
 
     function loadFavorites() {
@@ -74,6 +83,7 @@ ShellRoot {
         addUrlToFavorites(url, name);
         clipboardProc.command = ["wl-copy", url];
         clipboardProc.running = true;
+        
     }
     
     Process {
@@ -105,7 +115,6 @@ ShellRoot {
 
         root.favoriteGifs = favs;
         saveFavorites();
-        if (root.currentPanel === "favorites") updateSortedDisplay();
     }
 
     function sortFavorites(list) {
