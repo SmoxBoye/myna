@@ -46,13 +46,13 @@ ShellRoot {
     FileView {
         id: apiFile
         path: "file://" + root.homeDir + "/.config/myna/config.json"
-        blockLoading: false
+        blockLoading: true
     }
 
     FileView {
         id: favoritesFile
         path: "file://" + root.homeDir + "/.local/share/myna/favorites.json"
-        blockLoading: false
+        blockLoading: true
     }
 
     function loadFavorites() {
