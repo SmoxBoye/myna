@@ -11,7 +11,7 @@ let
 in
 {
   options.programs.myna = with lib; {
-    enable = mkEnableOption "GIF picker and viewer for Hyprland";
+    enable = mkEnableOption "GIF picker and viewer for Hyprland written in Quickshell";
 
     package = mkOption {
       type = types.package;

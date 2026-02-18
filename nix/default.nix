@@ -29,7 +29,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = {
-    description = "GIF picker and viewer for Hyprland";
+    description = "GIF picker and viewer for Hyprland written in Quickshell";
     license = lib.licenses.mit;
     mainProgram = "myna";
   };
