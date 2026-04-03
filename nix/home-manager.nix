@@ -23,7 +23,11 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ cfg.package ];
 
-    home.file.".config/myna/config.json".text = ''{"key": ""}'';
-    home.file.".local/share/myna/favorites.json".text = ''{"favorites": []}'';
+    home.file.".config/myna" = {
+      type = "directory";
+    };
+    home.file.".local/share/myna" = {
+      type = "directory";
+    };
   };
 }

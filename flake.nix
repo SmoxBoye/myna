@@ -38,6 +38,7 @@
             echo "------------------------------------------------"
             echo ":rocket: Quickshell Development Environment Active"
             echo "Source: ${inputs.quickshell.outPath}"
+            echo "User Home is: $HOME"
             echo "        To exit run \"exit\" or Ctrl-D"
             echo "------------------------------------------------"
 
